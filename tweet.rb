@@ -1,4 +1,4 @@
-#!/opt/local/bin/ruby
+#!/usr/bin/env ruby
 
 # command line tweeting script
 
@@ -9,7 +9,6 @@ require 'httparty'
 class Tweet
    include HTTParty
    base_uri 'ip-address.domaintools.com'
-   @verbose = true
    
    def initialize(accountname, message)
       @account = accountname
@@ -21,7 +20,6 @@ class Tweet
          path = File.join(File.join(ENV['HOME'], ".twitter"), "tweetlist.yml")
          tweetlist = YAML::load_file(path)
          @password = tweetlist[@account]['password']
-         puts "acct is #{@account} and password is #{@password}" if @verbose
       end
    end
    
@@ -43,7 +41,7 @@ class Tweet
                                        :user     => @account, 
                                        :password => @password)
          resource.post :status => @msg
-         puts "message posted: #{@msg}" if @verbose
+         puts "tweet to #{@account}: #{@msg}"
       end
    end
 end
