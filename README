@@ -1,0 +1,3 @@
+tweetr is another command-line tweet poster
+
+It looks up the account credentials from a YAML file based on the account name given as the first input arg. A hack borrowed from the great "ereiamjh" project is the ability to broadcast my laptop location based on domaintools.com info.
