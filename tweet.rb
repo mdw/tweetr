@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-
 # command line tweeting script
 
 require 'rubygems'
@@ -9,17 +8,19 @@ require 'httparty'
 class Tweet
    include HTTParty
    base_uri 'ip-address.domaintools.com'
+   TwitterPostUrl = "http://twitter.com/statuses/update.xml"
    
    def initialize(accountname, message)
       @account = accountname
-      @msg = accountname == "mikeslaptop" ? getlocation(message) : message
-      if @msg.length > 141 
+      @msg = accountname=="mikeslaptop" ? getlocation(message) : message
+      
+      if @msg.length > 140 
          puts "\nlength exceeded 140 character limit (#{@msg.length.to_s}), try again\n"
       else
          # lookup account info from YAML file
          path = File.join(File.join(ENV['HOME'], ".twitter"), "tweetlist.yml")
          tweetlist = YAML::load_file(path)
-         @password = tweetlist[@account]['password']
+         @pw = tweetlist[@account]['password']
       end
    end
    
@@ -31,15 +32,15 @@ class Tweet
       isp      = dnstools['isp']
       ip       = dnstools['ip_address']
       location = "#{city}, #{state}"
-      return "Hello from #{mess} in #{location}. I'm tweeting from #{isp} as #{ip}"
+      location = "Panera Bread Co. on #{mess}" if isp =~ /^Nuvox/
+      location = "Home #{mess}" if isp =~ /^Earthlink/
+      return "Hello from #{location}. I'm tweeting from #{isp} as #{ip}"
    end
    
    def update
       if @msg.length < 141
          RestClient.log = "stdout"
-         resource  = RestClient::Resource.new("http://twitter.com/statuses/update.xml", 
-                                       :user     => @account, 
-                                       :password => @password)
+         resource  = RestClient::Resource.new(TwitterPostUrl, :user => @account, :password => @pw)
          resource.post :status => @msg
          puts "tweet to #{@account}: #{@msg}"
       end
